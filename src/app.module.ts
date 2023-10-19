@@ -1,3 +1,4 @@
+import { ProductModule } from './services/product/product.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './services/auth/auth.module';
@@ -11,6 +12,7 @@ import { DatabaseConfiguration } from './config/database.config';
       useClass: DatabaseConfiguration,
     }),
     AuthModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [],

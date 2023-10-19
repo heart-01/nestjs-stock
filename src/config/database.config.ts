@@ -12,7 +12,7 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
 
       logging: true,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     };
   }
 }
