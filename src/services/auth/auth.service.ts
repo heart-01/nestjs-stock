@@ -66,4 +66,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token');
     }
   }
+
+  async findAll(keyword?: string): Promise<User[]> {
+    let found = [];
+    if (keyword) {
+      found = await this.userRepository
+        .createQueryBuilder('user')
+        .andWhere('user.username LIKE :keyword', {
+          keyword: `%${keyword}%`,
+        })
+        .getMany();
+    } else {
+      found = await this.userRepository.find();
+    }
+
+    return found;
+  }
 }
