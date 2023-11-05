@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserSignInDto } from './dto/user-signin.dto';
 import { UserSignUpDto } from './dto/user-signup.dto';
@@ -24,13 +28,10 @@ export class AuthService {
     }
 
     const { ...payload } = user;
-    const accessToken = this.jwtService.sign({ ...payload });
-    const refreshToken = this.jwtService.sign(
-      { ...payload },
-      { expiresIn: '7d' },
-    );
+    const token = this.signAccessToken(payload);
+    const refreshToken = this.signRefreshToken(payload);
 
-    return { ...user, token: accessToken, refreshToken };
+    return { ...user, token, refreshToken };
   }
 
   async verifyUserPassword(userSignInDto: UserSignInDto) {
@@ -42,29 +43,43 @@ export class AuthService {
     return;
   }
 
-  async signUp(userSignUpDto: UserSignUpDto): Promise<UserResponseDto> {
+  async signUp(userSignUpDto: UserSignUpDto) {
     const salt = bcrypt.genSaltSync();
     const password = await bcrypt.hash(userSignUpDto.password, salt);
-    const user = this.userRepository.create({
-      ...userSignUpDto,
-      salt,
-      password,
-    });
-    const newUser = await this.userRepository.save(user);
-    return new UserResponseDto(newUser);
+    try {
+      const user = this.userRepository.create({
+        ...userSignUpDto,
+        salt,
+        password,
+      });
+      const newUser = new UserResponseDto(await this.userRepository.save(user));
+      const token = this.signAccessToken(newUser);
+      const refreshToken = this.signRefreshToken(newUser);
+
+      return { ...newUser, token, refreshToken };
+    } catch (error) {
+      throw new ConflictException(error.message);
+    }
   }
 
-  async signAccessToken(refreshToken: string) {
+  async handleRefreshToken(tokenRefresh: string) {
     try {
-      const payloadRefreshToken = this.jwtService.verify(refreshToken);
+      const payloadRefreshToken = this.jwtService.verify(tokenRefresh);
       const { exp, iat, ...payloadAccessToken } = payloadRefreshToken;
-      const accessToken = this.jwtService.sign(payloadAccessToken, {
-        expiresIn: '1h',
-      });
-      return { ...payloadAccessToken, token: accessToken };
+      const accessToken = this.signAccessToken(payloadAccessToken);
+      const refreshToken = this.signRefreshToken(payloadAccessToken);
+      return { ...payloadAccessToken, token: accessToken, refreshToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  signAccessToken(payload: UserResponseDto) {
+    return this.jwtService.sign({ ...payload }, { expiresIn: '1h' });
+  }
+
+  signRefreshToken(payload: UserResponseDto) {
+    return this.jwtService.sign({ ...payload }, { expiresIn: '7d' });
   }
 
   async findAll(keyword?: string): Promise<User[]> {

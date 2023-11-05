@@ -20,7 +20,7 @@ export class AuthController {
   }
 
   @Post('auth/signup')
-  signUp(@Body() userSignUpDto: UserSignUpDto): Promise<UserResponseDto> {
+  signUp(@Body() userSignUpDto: UserSignUpDto) {
     return this.authenService.signUp(userSignUpDto);
   }
 
@@ -35,7 +35,7 @@ export class AuthController {
     },
   })
   async refreshToken(@Body() token: { refreshToken: string }) {
-    return this.authenService.signAccessToken(token.refreshToken);
+    return this.authenService.handleRefreshToken(token.refreshToken);
   }
 
   @Get('user')
