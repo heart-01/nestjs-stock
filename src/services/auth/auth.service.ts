@@ -97,4 +97,12 @@ export class AuthService {
 
     return found;
   }
+
+  async findProfile(accessToken: string) {
+    const payloadAccessToken = this.jwtService.verify(accessToken);
+    const found = await this.userRepository.findOne({ where: { username: payloadAccessToken.username } });
+    const user = new UserResponseDto(found);
+
+    return { ...user, token: accessToken };
+  }
 }

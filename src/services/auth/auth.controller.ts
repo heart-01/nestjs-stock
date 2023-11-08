@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -43,5 +51,12 @@ export class AuthController {
   @ApiQuery({ name: 'name', required: false })
   findAll(@Query('name') keyword: string): Promise<User[]> {
     return this.authenService.findAll(keyword);
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard())
+  findProfile(@Req() req) {
+    const accessToken = req.headers.authorization.split(' ')[1];
+    return this.authenService.findProfile(accessToken);
   }
 }
