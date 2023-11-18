@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags, } from '@nestjs/swagger';
@@ -7,6 +7,7 @@ import { multerOptions } from 'src/config/multer.config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductUpdateDto } from './dto/prodcut-update.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @ApiTags('Product')
 @ApiBearerAuth('authorization')
@@ -26,10 +27,15 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
+  @Get('image/:file')
+  getImage(@Param('file') fileName: string, @Res() res: Response) {
+    return this.productService.getImageProduct(fileName, res);
+  }
+
   @Post()
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: ProductCreateDto })
-  @UseInterceptors(FileInterceptor('file', multerOptions))
+  @UseInterceptors(FileInterceptor('file', multerOptions('product')))
   async create(
     @UploadedFile() file: Express.Multer.File,
     @Body() productCreateDto: ProductCreateDto,
@@ -40,7 +46,7 @@ export class ProductController {
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: ProductCreateDto })
-  @UseInterceptors(FileInterceptor('file', multerOptions))
+  @UseInterceptors(FileInterceptor('file', multerOptions('product')))
   update(
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,

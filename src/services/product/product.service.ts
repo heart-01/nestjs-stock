@@ -1,10 +1,18 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException, } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  Res,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/prodcut-update.dto';
 import { isEmpty } from 'lodash';
+import * as fs from 'fs';
+import { Response } from 'express';
 
 @Injectable()
 export class ProductService {
@@ -35,6 +43,17 @@ export class ProductService {
     });
     if (!found) throw new NotFoundException(`Product id ${id} not found`);
     return found;
+  }
+
+  getImageProduct(fileName: string, @Res() res: Response) {
+    const imagePath = `src/assets/uploads/product/${fileName}`;
+    if (fs.existsSync(imagePath)) {
+      res.setHeader('Content-Type', 'image/png');
+      const imageProduct = fs.createReadStream(imagePath).pipe(res);
+      return imageProduct;
+    } else {
+      throw new NotFoundException(`Image product ${fileName} not found`);
+    }
   }
 
   async create(
