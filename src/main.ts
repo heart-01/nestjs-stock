@@ -13,7 +13,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000'],
     methods: 'GET,PATCH,POST,DELETE',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept',
+    allowedHeaders: 'Content-Type, Authorization',
     exposedHeaders: 'Authorization',
     maxAge: 3600,
     optionsSuccessStatus: 204,
