@@ -25,12 +25,12 @@ async function bootstrap() {
     preflightContinue: false,
   });
 
-  // Middleware for URL-encoded form data.
-  app.use(express.urlencoded({ extended: true }));
-
   // Middleware for JSON data.
   app.use(express.json({ limit: '10mb' }));
 
+  // Middleware for URL-encoded form data.
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+  
   // Middleware for serving static files.
   app.use(express.static('public'));
 
