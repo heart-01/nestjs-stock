@@ -18,8 +18,14 @@ export class ProductController {
 
   @Get()
   @ApiQuery({ name: 'name', required: false })
-  findAll(@Query('name') keyword: string): Promise<Product[]> {
-    return this.productService.findAll(keyword);
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  findAll(
+    @Query('name') keyword: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<{ data: Product[]; total: number; page: number; limit: number }[]> {
+    return this.productService.findAll(keyword, page, limit);
   }
 
   @Get(':id')
@@ -56,7 +62,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: number): Promise<Product> {
     return this.productService.delete(id);
   }
 }
