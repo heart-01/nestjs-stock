@@ -24,7 +24,7 @@ export class ProductController {
     @Query('name') keyword: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
-  ): Promise<{ data: Product[]; total: number; page: number; limit: number }[]> {
+  ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
     return this.productService.findAll(keyword, page, limit);
   }
 

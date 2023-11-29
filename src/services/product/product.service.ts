@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-  Res,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, Res} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -25,7 +19,7 @@ export class ProductService {
     keyword?: string,
     page: number = 1,
     limit: number = 10,
-  ): Promise<{ data: Product[]; total: number; page: number; limit: number }[]> {
+  ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
     let queryPromise: Promise<[Product[], number]>;
     let response: { data: Product[]; total: number; page: number; limit: number; }[] = [];
 
@@ -44,6 +38,8 @@ export class ProductService {
     }
 
     const [products, total] = await queryPromise;
+
+    // example response [data, total, page, limit]
     response.push({
       data: products,
       total,
@@ -51,7 +47,12 @@ export class ProductService {
       limit,
     });
 
-    return response;
+    return {
+      data: products,
+      total,
+      page,
+      limit,
+    };
   }
 
   async findOne(id: number): Promise<Product> {
