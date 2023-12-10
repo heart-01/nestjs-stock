@@ -17,7 +17,7 @@ export class ProductService {
 
   async findAll(
     keyword?: string,
-    page: number = 1,
+    page: number = 0,
     limit: number = 10,
   ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
     let queryPromise: Promise<[Product[], number]>;
@@ -27,13 +27,13 @@ export class ProductService {
       queryPromise = this.productRepository
         .createQueryBuilder('product')
         .andWhere('product.name LIKE :keyword', { keyword: `%${keyword}%` })
-        .skip((page - 1) * limit)
+        .skip((page) * limit)
         .take(limit)
         .getManyAndCount();
     } else {
       queryPromise = this.productRepository.findAndCount({
         take: limit,
-        skip: (page - 1) * limit,
+        skip: (page) * limit,
       });
     }
 
