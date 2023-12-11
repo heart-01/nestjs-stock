@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductUpdateDto } from './dto/prodcut-update.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { ParseQueryArrayValuePipe } from 'src/pipes/parse-query-array-value-pipes';
 
 @ApiTags('Product')
 @ApiBearerAuth('authorization')
@@ -29,8 +30,16 @@ export class ProductController {
   }
 
   @Get(':id')
-  find(@Param('id') id: number): Promise<Product> {
+  findOne(@Param('id') id: number): Promise<Product> {
     return this.productService.findOne(id);
+  }
+
+  // 'query/multiple?ids=1&ids=2&ids=3' or 'query/multiple?ids=[1,2,3]'
+  @Get('query/multiple')
+  findByIds(
+    @Query('ids', new ParseQueryArrayValuePipe()) ids: number[],
+  ): Promise<Product[]> {
+    return this.productService.findByIds(ids);
   }
 
   @Get('image/:file')

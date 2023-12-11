@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, Res} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/prodcut-update.dto';
 import { isEmpty } from 'lodash';
@@ -60,6 +60,16 @@ export class ProductService {
       where: { id },
     });
     if (!found) throw new NotFoundException(`Product id ${id} not found`);
+    return found;
+  }
+
+  async findByIds(ids: number[]): Promise<Product[]> {
+    if(isEmpty(ids)){
+      throw new NotFoundException(`Product ids is required`);
+    }
+    const found = await this.productRepository.find({
+      where: { id: In(ids) },
+    });
     return found;
   }
 
