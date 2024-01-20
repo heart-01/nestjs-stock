@@ -27,11 +27,13 @@ export class ProductService {
       queryPromise = this.productRepository
         .createQueryBuilder('product')
         .andWhere('product.name LIKE :keyword', { keyword: `%${keyword}%` })
+        .orderBy('product.id', 'ASC')
         .skip((page) * limit)
         .take(limit)
         .getManyAndCount();
     } else {
       queryPromise = this.productRepository.findAndCount({
+        order: { id: 'ASC' },
         take: limit,
         skip: (page) * limit,
       });
