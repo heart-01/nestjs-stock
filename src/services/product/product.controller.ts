@@ -50,24 +50,24 @@ export class ProductController {
   @Post()
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: ProductCreateDto })
-  @UseInterceptors(FileInterceptor('file', multerOptions('product')))
+  @UseInterceptors(FileInterceptor('image', multerOptions('product')))
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File,
     @Body() productCreateDto: ProductCreateDto,
   ): Promise<Product> {
-    return this.productService.create(productCreateDto, file);
+    return this.productService.create(productCreateDto, image);
   }
 
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: ProductCreateDto })
-  @UseInterceptors(FileInterceptor('file', multerOptions('product')))
+  @UseInterceptors(FileInterceptor('image', multerOptions('product')))
   update(
     @Param('id') id: number,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File,
     @Body() productUpdateDto: ProductUpdateDto,
   ): Promise<Product> {
-    return this.productService.update(id, productUpdateDto, file);
+    return this.productService.update(id, productUpdateDto, image);
   }
 
   @Delete(':id')

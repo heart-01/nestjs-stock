@@ -88,12 +88,12 @@ export class ProductService {
 
   async create(
     productCreateDto: ProductCreateDto,
-    file: Express.Multer.File,
+    image: Express.Multer.File,
   ): Promise<Product> {
     try {
       const product = this.productRepository.create({
         ...productCreateDto,
-        image: isEmpty(file) ? null : file.filename,
+        image: isEmpty(image) ? null : image.filename,
       });
       return await this.productRepository.save(product);
     } catch (error) {
@@ -104,13 +104,13 @@ export class ProductService {
   async update(
     id: number,
     productUpdateDto: ProductUpdateDto,
-    file: Express.Multer.File,
+    image: Express.Multer.File,
   ): Promise<Product> {
     try {
       const product = await this.findOne(id);
       await this.productRepository.update(id, {
         ...productUpdateDto,
-        image: isEmpty(file) ? product.image : file.filename,
+        image: isEmpty(image) ? product.image : image.filename,
       });
       return await this.findOne(id);
     } catch (error) {
